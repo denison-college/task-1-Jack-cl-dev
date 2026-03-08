@@ -1,68 +1,47 @@
 import os
-
-def test():
-    print("The test function was called.")
-def settings(): #it is starting to occur to me that I really should have used a proper CLI library.
-    # colour_list = { #if I end up using this, I have to import all the colours as a
-    #     '1': colour1,
-    #     '2': colour2,
-    #     '3': colour3,
-    #     '4': colour4,
-    #     '5': colour5,
-    #     '6': colour6,
-    #     '7': colour7,
-    #     '8': colour8
-    # }
-    sound_enabled = True
+def settings(sound_enabled=None):
     def sound_settings():
         os.system('cls' if os.name == 'nt' else 'clear')
-        answer = input('Would you like to DISABLE game sounds? (Y/N)')
+        answer = input('Would you like to DISABLE game sounds? (Y/N) ')
+
         if answer.casefold() == 'y':
-            sound_enabled = False
-            return sound_enabled
+            print("Sounds have been disabled.")
+            input('Press enter to return to the settings menu.')
+            return False
+        elif answer.casefold() == 'n':
+            print("Sounds have been enabled.")
+            input('Press enter to return to the settings menu.')
+            return True
+
+        return None
 
     os.system('cls' if os.name == 'nt' else 'clear')
     print("Settings:")
     print('''
     Choose a category:
-    
+
     [1]: Colour customisation
     [2]: Sound options
     [3]: Symbol customisation
-    
+
     [R]: Return
     ''')
+
     option = input()
-    if option == 2:  # Does this work? '2'?
-        sound_settings()
 
-    # TODO: Rethink the entire way i was planning to do colours.
+    if option == "2":
+        new_value = sound_settings()
+        if new_value is not None:
+            sound_enabled = new_value
+        return settings(sound_enabled)
 
-    # elif option == "1": #There are so, so many ways to do this, I am sure. All of them would be better than this abomination.
-    #     print(f'''
-    #     Colour customisation:
-    #
-    #     [1]: Colour of number one (Currently {colour1})
-    #     [2]: Colour of number two (Currently {colour2})
-    #     [3]: Colour of number three (Currently {colour3})
-    #     [4]: Colour of number four (Currently {colour4})
-    #     [5]: Colour of number five (Currently {colour5})
-    #     [6]: Colour of number six (Currently {colour6})
-    #     [7]: Colour of number seven (Currently {colour7})
-    #     [8]: Colour of number Eight (Currently {colour8})
-    #
-    #     [R]: Return
-    #     ''')
-    #     option = input()
-    #     new_colour = input(f'What would you like to change {option} to? (red, green, yellow, etc)')
-    #     colour_list.get(option)
+    elif option.casefold() == 'r':
+        return sound_enabled
 
-    elif option.casefold() == 'R':
-        return(sound_enabled) #Returns the values of all the settings for use elsewhere.
+    return None
 
 
 dispatch_table = { #The dispatch table should contain an entry of every command that can be called.
-    "test": test,
     "settings": settings,
 }
 
