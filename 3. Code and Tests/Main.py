@@ -1,11 +1,12 @@
 import os
+from tinydb import TinyDB, Query
 
+db = TinyDB('db.json')
 game_settings = {
     "flag_symbol": "X",
     "mine symbol": "O",
 }
 sound_enabled = True
-
 game_colours = {
     "background": "black", #not sure if I can implement this, and if I can, not sure if I can do it like this.
     "text": "white",
@@ -15,6 +16,29 @@ game_colours = {
     "mine_count": "blue",
     "timer_colour": "magenta"
 }
+
+if not db.all():
+    db.insert({'settings': game_settings})
+    db.insert({'colours': game_colours})
+    db.insert({'sound_enabled': sound_enabled})
+else: #Does this even work?
+    print('[DEBUG] Database already exists.')
+    game_settings = db.all()[0]['settings']
+    game_colours = db.all()[0]['colours']
+    sound_enabled = db.all()[0]['sound_enabled']
+
+def settings_update():
+    db.update({'settings': game_settings})
+    db.update({'colours': game_colours})
+    db.update({'sound_enabled': sound_enabled})
+    #The following is for debug purposes only.
+
+def debug2():
+    settings_update()
+    result = db.search(Query().settings.exists())
+    if result:
+        print(result[0]['settings'])  # Print just the settings dict
+
 def settings():
     global sound_enabled
     def sound_settings():
@@ -38,9 +62,9 @@ def settings():
             print("Invalid option.")
             input('Press enter to try again.')
 
-    def symbol_settings():  # TODO: ensure that the default settings, and changes made to those settings, are all written into a file.
+    def symbol_settings():
         global game_settings
-
+        settings_update()
         while True:
             os.system('cls' if os.name == 'nt' else 'clear')
             print(f'''
@@ -144,6 +168,7 @@ def settings():
 
 dispatch_table = {  # The dispatch table should contain an entry of every command that can be called.
     "settings": settings,
+    "debug": debug2,
 }
 
 def main_menu(invoked_from):  # This (mediocre) code checks if the main menu is being run on startup or midgame
@@ -174,8 +199,8 @@ def main_menu(invoked_from):  # This (mediocre) code checks if the main menu is 
         if handler:  # Checks if the handler successfully called a command and produces an error if it was not.
             handler()
         else:
-            capitalised_input = command_input.capitalize()  # allows the user to enter the quit option in any case.
-            if capitalised_input == option_key:
+            input_casefold = command_input.casefold()  # allows the user to enter the quit option in any case.
+            if input_casefold == option_key:
                 exit()
             else:
                 try:
