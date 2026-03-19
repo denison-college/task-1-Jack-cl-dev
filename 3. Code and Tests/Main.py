@@ -1,31 +1,31 @@
 import os
 from tinydb import TinyDB, Query
-
+import game
 db = TinyDB('db.json')
-game_settings = {
-    "flag_symbol": "X",
-    "mine symbol": "O",
-}
-sound_enabled = True
-game_colours = {
-    "background": "black", #not sure if I can implement this, and if I can, not sure if I can do it like this.
-    "text": "white",
-    "flag": "red",
-    "mine": "green",
-    "title": "yellow",
-    "mine_count": "blue",
-    "timer_colour": "magenta"
-}
 
-if not db.all():
-    db.insert({'settings': game_settings})
-    db.insert({'colours': game_colours})
-    db.insert({'sound_enabled': sound_enabled})
-else: #Does this even work?
-    print('[DEBUG] Database already exists.')
-    game_settings = db.all()[0]['settings']
-    game_colours = db.all()[0]['colours']
-    sound_enabled = db.all()[0]['sound_enabled']
+if db.all():
+    # Load settings from the database
+    data = db.all()[0]
+    game_settings = data['settings']
+    game_colours = data['colours']
+    sound_enabled = data['sound_enabled']
+else:
+    # First run - use defaults and save to the database
+    game_settings = {
+        "flag_symbol": "X",
+        "mine symbol": "O",
+    }
+    sound_enabled = True
+    game_colours = {
+        "background": "black",
+        "text": "white",
+        "flag": "red",
+        "mine": "green",
+        "title": "yellow",
+        "mine_count": "blue",
+        "timer_colour": "magenta"
+    }
+    db.insert({'settings': game_settings, 'colours': game_colours, 'sound_enabled': sound_enabled})
 
 def settings_update():
     db.update({'settings': game_settings})
@@ -210,4 +210,4 @@ def main_menu(invoked_from):  # This (mediocre) code checks if the main menu is 
                     input("Press enter to continue.")
 
 difficulty=main_menu(1)
-print(difficulty)
+game.run(difficulty)
