@@ -3,6 +3,9 @@ from tinydb import TinyDB, Query
 import game
 db = TinyDB('db.json')
 
+#TODO: Question mark command not recognised, fix this.
+#TODO: Figure out why there are two database files
+#TODO: Q main menu input doesn't work
 if db.all():
     # Load settings from the database
     data = db.all()[0]
@@ -210,4 +213,5 @@ def main_menu(invoked_from):  # This (mediocre) code checks if the main menu is 
                     input("Press enter to continue.")
 
 difficulty=main_menu(1)
+main_menu("1")
 game.run(difficulty)
