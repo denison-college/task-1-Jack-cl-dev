@@ -1,11 +1,10 @@
 import os
-from tinydb import TinyDB, Query
-import game
-db = TinyDB('db.json')
+from tinydb import TinyDB
 
-#TODO: Question mark command not recognised, fix this.
-#TODO: Figure out why there are two database files
-#TODO: Q main menu input doesn't work
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__)) # Get the directory where this script is located to avoid duplicates when run from different locations.
+db = TinyDB(os.path.join(SCRIPT_DIR, 'db.json'))
+
 if db.all():
     # Load settings from the database
     data = db.all()[0]
@@ -29,19 +28,13 @@ else:
         "timer_colour": "magenta"
     }
     db.insert({'settings': game_settings, 'colours': game_colours, 'sound_enabled': sound_enabled})
-
+def help_menu():
+    pass
 def settings_update():
     db.update({'settings': game_settings})
     db.update({'colours': game_colours})
     db.update({'sound_enabled': sound_enabled})
     #The following is for debug purposes only.
-
-def debug2():
-    settings_update()
-    result = db.search(Query().settings.exists())
-    if result:
-        print(result[0]['settings'])  # Print just the settings dict
-
 def settings():
     global sound_enabled
     def sound_settings():
@@ -171,7 +164,7 @@ def settings():
 
 dispatch_table = {  # The dispatch table should contain an entry of every command that can be called.
     "settings": settings,
-    "debug": debug2,
+    "?": help_menu,
 }
 
 def main_menu(invoked_from):  # This (mediocre) code checks if the main menu is being run on startup or midgame
@@ -198,20 +191,18 @@ def main_menu(invoked_from):  # This (mediocre) code checks if the main menu is 
 
         command_input = input("Select an option or enter a command:\n").strip()
         handler = dispatch_table.get(command_input)  # Uses get to get the input command from the dispatch table.
-
-        if handler:  # Checks if the handler successfully called a command and produces an error if it was not.
+        input_casefold = command_input.casefold()  # allows the user to enter the quit option in any case.
+        if input_casefold == option_key.casefold():
+            exit()
+        elif handler:  # Checks if the handler successfully called a command and produces an error if it was not.
             handler()
         else:
-            input_casefold = command_input.casefold()  # allows the user to enter the quit option in any case.
-            if input_casefold == option_key:
-                exit()
-            else:
-                try:
-                    return int(command_input)
-                except ValueError:
-                    print("Command not recognised.")
-                    input("Press enter to continue.")
+            try:
+                return int(command_input)
+            except ValueError:
+                print("Command not recognised.")
+                input("Press enter to continue.")
 
 difficulty=main_menu(1)
-main_menu("1")
-game.run(difficulty)
+#main_menu(1)
+#game.run(difficulty)
