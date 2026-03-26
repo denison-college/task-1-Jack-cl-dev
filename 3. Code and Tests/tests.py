@@ -5,9 +5,9 @@ from tinydb import TinyDB
 
 def load_main_module(monkeypatch, startup_inputs=None):
     """
-    Import Main.py safely by patching input/os.system before import.
+    Import main.py safely by patching input/os.system before import.
 
-    Main.py executes main_menu(...) at import time, so we need to provide
+    main.py executes main_menu(...) at import time, so we need to provide
     enough mocked input values for that startup path.
     """
     if startup_inputs is None:

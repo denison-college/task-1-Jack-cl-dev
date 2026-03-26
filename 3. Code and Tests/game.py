@@ -1,8 +1,24 @@
 import curses
 import numpy as np
 import time
+#On Windows, this project needs to be run with the windows-curses package installed. Not sure how to package this with the EXE.
 
-#This project needs to be run with the windows-curses package installed. Not sure how to package this with the EXE.
+# Dictionary for short variable names used throughout this file:
+# r      = row index (current cell)
+# c      = column index (current cell)
+# dr     = delta row (offset for neighbour checking: -1, 0, or 1)
+# dc     = delta column (offset for neighbour checking: -1, 0, or 1)
+# fr     = first click row
+# fc     = first click column
+# nr     = neighbour row (r + dr)
+# nc     = neighbour column (c + dc)
+# h      = height (terminal window)
+# w      = width (terminal window)
+# fg     = foreground colour
+# bg     = background colour
+# stdscr = standard screen (curses main window object)
+# attr   = attribute (curses text formatting/colour)
+# ui     = user input
 
 difficulty_size = {
     1: (9, 9),
@@ -147,7 +163,15 @@ def run(difficulty, settings, colours):
             "yellow": curses.COLOR_YELLOW,
             "blue": curses.COLOR_BLUE,
             "magenta": curses.COLOR_MAGENTA,
-            "cyan": curses.COLOR_CYAN
+            "cyan": curses.COLOR_CYAN,
+            "1": curses.COLOR_CYAN,
+            "2": curses.COLOR_GREEN,
+            "3": curses.COLOR_RED,
+            "4": curses.COLOR_BLUE,
+            "5": curses.COLOR_YELLOW,
+            "6": curses.COLOR_MAGENTA,
+            "7": curses.COLOR_CYAN,
+            "8": curses.COLOR_BLACK,
         }
 
         # Background and Text
@@ -244,7 +268,7 @@ def run(difficulty, settings, colours):
                         message = " Game Over! You hit a mine. Press any key to exit. "
                     else:
                         reveal_tile(r, c)
-                        # Check win condition: if only mines are left hidden/flagged
+                        #Check win condition: if only mines are left hidden/flagged
                         hidden_count = np.count_nonzero(visible_board == 'x') + np.count_nonzero(visible_board == 'F')
                         if hidden_count == total_mines:
                             game_over = True
@@ -252,7 +276,6 @@ def run(difficulty, settings, colours):
                             start_time = None
                             message = f" You Win! All mines cleared in {int(final_time)}s. Press any key to exit. "
                 elif visible_board[r, c].isdigit():
-                    # Chording logic
                     num = int(visible_board[r, c])
                     adjacent_flags = 0
                     rows, cols = data_board.shape
@@ -272,17 +295,17 @@ def run(difficulty, settings, colours):
                                 if 0 <= nr < rows and 0 <= nc < cols:
                                     if visible_board[nr, nc] == 'x':
                                         if data_board[nr, nc] == 'M':
-                                            # Hit a mine via chording
+                                            #Hit a mine
                                             mine_positions = np.where(data_board == 'M')
                                             visible_board[mine_positions] = 'M'
                                             game_over = True
                                             final_time = time.time() - start_time
                                             start_time = None
-                                            message = " Game Over! Chording hit a mine. Press any key to exit. "
+                                            message = " Game Over! Press any key to exit. "
                                         else:
                                             reveal_tile(nr, nc)
                         
-                        # Check win condition after chording
+                        #Check win condition
                         hidden_count = np.count_nonzero(visible_board == 'x') + np.count_nonzero(visible_board == 'F')
                         if not game_over and hidden_count == total_mines:
                             game_over = True
@@ -291,7 +314,7 @@ def run(difficulty, settings, colours):
                             message = f" You Win! All mines cleared in {int(final_time)}s. Press any key to exit. "
 
             elif key == ord('f'):
-                if not mines_placed: #don't allow flags before the first click
+                if not mines_placed: #Don't allow flags before the first click
                     continue
                 r, c = cursor_pos
                 if visible_board[r, c] == 'x':

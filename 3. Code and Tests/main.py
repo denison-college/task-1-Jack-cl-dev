@@ -1,9 +1,12 @@
 import os
 from tinydb import TinyDB
-
+import game
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__)) # Get the directory where this script is located to avoid duplicates when run from different locations.
 db = TinyDB(os.path.join(SCRIPT_DIR, 'db.json'))
+
+# Valid curses colours
+VALID_COLOURS = ["black", "white", "red", "green", "yellow", "blue", "magenta", "cyan"]
 
 if db.all():
     # Load settings from the database
@@ -25,9 +28,18 @@ else:
         "mine": "green",
         "title": "yellow",
         "mine_count": "blue",
-        "timer_colour": "magenta"
+        "timer_colour": "magenta",
+        "1": "blue",
+        "2": "green",
+        "3": "red",
+        "4": "blue",
+        "5": "red",
+        "6": "cyan",
+        "7": "magenta",
+        "8": "white"
     }
     db.insert({'settings': game_settings, 'colours': game_colours, 'sound_enabled': sound_enabled})
+
 def help_menu():
     pass
 def settings_update():
@@ -91,13 +103,15 @@ def settings():
 
                 input('Press enter to continue.')
 
-    def colour_settings():
+    def colour_settings(): #TODO: clean up valid colours
         global game_colours
 
         while True:
             os.system('cls' if os.name == 'nt' else 'clear')
             print(f'''
         Current colours:
+        
+        valid colours: {VALID_COLOURS} 
 
         background: {game_colours["background"]}
         text: {game_colours["text"]}
@@ -106,6 +120,14 @@ def settings():
         title: {game_colours["title"]}
         mine_count: {game_colours["mine_count"]}
         timer_colour: {game_colours["timer_colour"]}
+        1: {game_colours["1"]}
+        2: {game_colours["2"]}
+        3: {game_colours["3"]}
+        4: {game_colours["4"]}
+        5: {game_colours["5"]}
+        6: {game_colours["6"]}
+        7: {game_colours["7"]}
+        8: {game_colours["8"]}
 
         Type the name of the colour setting you would like to change.
         Press Enter or type R to return to the settings menu.
@@ -204,5 +226,4 @@ def main_menu(invoked_from):  # This (mediocre) code checks if the main menu is 
                 input("Press enter to continue.")
 
 difficulty=main_menu(1)
-#main_menu(1)
-#game.run(difficulty)
+game.run(difficulty, game_settings, game_colours,)

@@ -3,6 +3,7 @@
     <words>
       <w>casefold</w>
       <w>ingame</w>
+      <w>stdscr</w>
     </words>
   </dictionary>
 </component>
